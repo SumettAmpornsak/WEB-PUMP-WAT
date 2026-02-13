@@ -364,7 +364,8 @@
             <div class="control-group">
                 <label>Refresh every</label>
                 <select id="refreshInterval">
-                    <option value="500" selected>0.5 seconds</option>
+                    <option value="250" selected>0.25 seconds</option>
+                    <option value="500" >0.5 seconds</option>
                     <option value="1000">1 second</option>
                     <option value="2000">2 seconds</option>
                     <option value="3000">3 seconds</option>
@@ -503,7 +504,7 @@
 
             Swal.fire({
                 icon: "success",
-                title: "เสร็จเรียบร้อย 🎉",
+                title: "เสร็จเรียบร้อย",
                 text: `เพิ่ม Counter ครบ ${maxLoop} ครั้งแล้ว`
             });
         }
@@ -539,5 +540,6 @@
     </script>
 
 </body>
+
 
 </html>
