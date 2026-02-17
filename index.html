@@ -15,6 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        /* CSS เดิมของคุณ保持不变 */
         * {
             margin: 0;
             padding: 0;
@@ -207,6 +208,11 @@
             margin-top: auto;
         }
 
+        /* ซ่อนตัวนับไม่ให้แสดงผลรบกวนหน้าเว็บ */
+        .hidden-counter {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             main {
                 padding: 30px 16px;
@@ -365,7 +371,7 @@
                 <label>Refresh every</label>
                 <select id="refreshInterval">
                     <option value="250" selected>0.25 seconds</option>
-                    <option value="500" >0.5 seconds</option>
+                    <option value="500">0.5 seconds</option>
                     <option value="1000">1 second</option>
                     <option value="2000">2 seconds</option>
                     <option value="3000">3 seconds</option>
@@ -380,6 +386,15 @@
             <div class="control-group">
                 <label>Loop count</label>
                 <input id="loopCount" type="number" min="1" value="100">
+            </div>
+
+            <!-- เพิ่มตัวเลือก Counter type -->
+            <div class="control-group">
+                <label>Counter type</label>
+                <select id="counterType">
+                    <option value="optistats" selected>Optistats (สีดำ)</option>
+                    <option value="gnrcounter">Gnrcounter (สีส้ม)</option>
+                </select>
             </div>
         </div>
 
@@ -404,12 +419,30 @@
         &copy; 2024 WEB PUMPS — Counter Automation By Sumett studio
     </footer>
 
+    <!-- ตัวนับ Optistats (สีดำ) ซ่อนไว้ -->
+    <div id="sfcr2ya8fp84zc8gbf63prdj5spq97axjr4" class="hidden-counter"></div>
+    <script type="text/javascript" src="https://counter1.optistats.ovh/private/counter.js?c=r2ya8fp84zc8gbf63prdj5spq97axjr4&down=async" async></script>
+    <noscript>
+        <a href="https://www.freecounterstat.com" title="website hits counter">
+            <img src="https://counter1.optistats.ovh/private/freecounterstat.php?c=r2ya8fp84zc8gbf63prdj5spq97axjr4" border="0" title="website hits counter" alt="website hits counter">
+        </a>
+    </noscript>
+
+    <!-- ตัวนับ Gnrcounter (สีส้ม) ซ่อนไว้ -->
+    <div class="hidden-counter">
+        <script language="JavaScript" type="text/javascript" src="https://gnrcounter.com/counter.php?accId=3acb500fcfb8f9cc3c5d2bd798e55873"></script>
+        <noscript>
+            <a href="https://gnrcounter.com" title="Web Analytics">Web Analytics</a>
+        </noscript>
+    </div>
+
     <script>
         let timer = null;
         let loop = 0;
         let maxLoop = 0;
         let intervalMs = 0;
         let paused = false;
+        let selectedCounter = 'optistats'; // เก็บค่า counter ที่เลือก
 
         // Load from localStorage
         window.addEventListener("load", () => {
@@ -418,6 +451,12 @@
                 maxLoop = parseInt(localStorage.getItem("maxLoop"));
                 intervalMs = parseInt(localStorage.getItem("intervalMs"));
                 paused = localStorage.getItem("paused") === "true";
+                // โหลดค่า counter type ที่บันทึกไว้
+                const savedCounter = localStorage.getItem("counterType");
+                if (savedCounter) {
+                    document.getElementById("counterType").value = savedCounter;
+                    selectedCounter = savedCounter;
+                }
 
                 document.getElementById("refreshInterval").value = intervalMs;
                 document.getElementById("loopCount").value = maxLoop;
@@ -434,12 +473,15 @@
             maxLoop = parseInt(document.getElementById("loopCount").value);
             loop = 0;
             paused = false;
+            selectedCounter = document.getElementById("counterType").value; // อ่านค่าที่เลือก
 
+            // บันทึกลง localStorage
             localStorage.setItem("loop", loop);
             localStorage.setItem("maxLoop", maxLoop);
             localStorage.setItem("intervalMs", intervalMs);
             localStorage.setItem("running", "true");
             localStorage.setItem("paused", "false");
+            localStorage.setItem("counterType", selectedCounter);
 
             lockUI(true);
             runTimer();
@@ -453,9 +495,16 @@
                 loop++;
                 localStorage.setItem("loop", loop);
 
-                // ยิง counter
+                // เลือก URL ตามค่า selectedCounter
                 let img = new Image();
-                img.src = "https://counter1.optistats.ovh/private/freecounterstat.php?c=sfcr2ya8fp84zc8gbf63prdj5spq97axjr4&rand=" + Math.random();
+                let url;
+                if (selectedCounter === 'optistats') {
+                    url = "https://counter1.optistats.ovh/private/freecounterstat.php?c=r2ya8fp84zc8gbf63prdj5spq97axjr4&rand=" + Math.random();
+                } else {
+                    url = "https://gnrcounter.com/counter.php?accId=3acb500fcfb8f9cc3c5d2bd798e55873&rand=" + Math.random();
+                }
+                img.src = url;
+
                 updateUI();
 
                 if (loop >= maxLoop) finishAuto();
@@ -520,6 +569,7 @@
             document.getElementById("resumeBtn").disabled = true;
             document.getElementById("refreshInterval").disabled = state;
             document.getElementById("loopCount").disabled = state;
+            document.getElementById("counterType").disabled = state; // ปิดการเลือกขณะทำงาน
         }
 
         function updateUI() {
@@ -541,6 +591,4 @@
 
 </body>
 
-
 </html>
-
